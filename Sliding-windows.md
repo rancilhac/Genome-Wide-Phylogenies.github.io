@@ -17,9 +17,9 @@ source("Topo_windows_v03.R")
 topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "test", 
                    write.seq = T, nj = T, dna.dist = "JC69")
 ```
-Here are what the options do:
-`vcf`: name of the vcf file (or full path if it is not in the working directory)
-`size`: size of the window (number of sites). Note that invariant sites are removed when the vcf is read in (see the documentation of vcfR for more details)
+For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do:
+`vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped
+`size`: size of the window (number of sites). Note that invariant sites and indels are removed when the vcf is read in (see the documentation of vcfR for more details)
 `incr`: an increment defining overlap across windows (number of sites). 0 means no overlap
 `phased`: whether the data is phased or not. If the data is phased, two sequences are used for each (diploid) samples. If the data is not phased, a consensus sequence is generated with IUPAC ambiguity codes used at heterozygous positions
 `prefix`: a prefix for the output files
@@ -28,7 +28,44 @@ Here are what the options do:
 
 Most of these parameters are relatively straighforward to set. The size of the window depends a lot on the aim of the analysis, divergence times across species, the proportion of allele sharing and LD decay. I recommend to try different values and vizualy explore the resulting trees before deciding on a value. Whether to use overlapping windows depend on the question addressed. Typically, phylogenetic inference based on gene trees requires independent markers, and thus overlapping windows won't do. On the other hand, genome scans aimed at detecting fine-scale changes in topological support may benefit from using overlapping windows.
 
-## Exploring the results
+Practical note: the vcf importation into R can take a lot of memory. For very large chromosomes, I sometime had to split the vcfs in several parts.
+
+## Outputs
+
+Two output files were created:
+`test_NJ_trees.trees`: this file contains the neighbor-joining trees in Newick format, one per line. In case the calculation of the tree fails, NA is printed instead of a tree. It can be opened in a regular phylogenetic tree viewer (e.g., FigTree)
+`test_windows_stats.tsv`: this file is a tab-separated table containing metadata for each window on a separate line
+
+```
+CHR    CHR.START  CHR.END  CHR.SIZE  NSITES  PROP.MISS  PROP.PIS  TREE  NTIPS
+chr22  67         20215    20148    500      0.0772     1         YES   114
+chr22  20275      36961    16686    500      0.0742     1         YES   114
+chr22  37118      61175    24057    500      0.0871     1         YES   114
+```
+`CHR`: chromosome name
+`CHR.START`: start coordinate
+`CHR.END`: end coordinate
+`CHR.SIZE`: actual size on the chromosome (i.e., CHR.END - CHR.START)
+`NSITES`: number of SNPs in the window
+`PROP.MISS`: proportion of missing genotypes
+`PROP.PIS`: proportion of parcimony-informative SNPs
+`TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file)
+`NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples)
+Next we will see how to use these two files to filter and subset the trees.
+
+## Inferring trees using likelihood approaches
+
+The `TopoWindows` R functions can only calculate NJ trees internaly. However, when `write.seq = T`, fasta alignments are written for each windows that can be analysed with an external software. The alignements are written in `test_sequences` with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta).
+I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on preference, including Bayesian inference softwares. Here is how to calculate the tree with IQTREE in a UNIX comand line environment:
+```bash:
+cd test_sequences
+for i in *fasta
+do
+iqtree2 -s ${i} -m TEST+ASC -T 1
+done
+
+cat *.treefile > test_ML_trees.trees
+```
 
 
 
