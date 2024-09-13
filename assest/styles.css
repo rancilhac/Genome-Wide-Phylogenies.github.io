@@ -7,6 +7,10 @@
     background-color: #f4f4f4;
     padding: 15px;
     border-right: 1px solid #ddd;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .content {
