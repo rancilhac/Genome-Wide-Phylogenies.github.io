@@ -1,4 +1,4 @@
 title: Local phylogenetic analyses of genomic data
 description: A tutorial to calculate, vizualize and analyse phylogenetic trees from whole genome data 
-theme: jekyll-theme-cayman # You can change the theme
+theme: minima # You can change the theme
 markdown: kramdown
