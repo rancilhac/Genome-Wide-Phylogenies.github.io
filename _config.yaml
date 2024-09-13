@@ -1,2 +1,4 @@
-name: Genome-Wide-Phylogenies.github.io
-theme: minima
+title: Local phylogenetic analyses of genomic data
+description: A tutorial to calculate, vizualize and analyse phylogenetic trees from whole genome data 
+theme: jekyll-theme-cayman # You can change the theme
+markdown: kramdown
