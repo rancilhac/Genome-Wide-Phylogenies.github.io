@@ -114,7 +114,7 @@ This will result in the same output files as previously.
 #SBATCH -a 1-3
 
 #Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
-PREF=$(echo chr${SLUR_ARRAY_TaSK_ID}.vcf.gz | cut -d'.' -f1)
+PREF=$(echo chr${SLUR_ARRAY_TASK_ID}.vcf.gz | cut -d'.' -f1)
 
 Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf chr${SLUR_ARRAY_TaSK_ID}.vcf.gz --type s --size 500 --incr 0 --phased T --nj T --ali T --dist NJ69
 ```
@@ -134,7 +134,7 @@ Now, we can use a similar job script as previously (again, assuming three fasta 
 #SBATCH -a 0-2
 
 #Read the list of fastas into a variable
-FASTALIST=$(<all_vcfs.txt)
+FASTALIST=$(<all_fastas.txt)
 #Identify the current chromosome based on the array ID (starting with 0 because indices are 0-based in bash contrary to e.g. R)
 FASTA=${FASTALIST}[${SLURM_ARRAY_TASK_ID}]
 
