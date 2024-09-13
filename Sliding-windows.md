@@ -55,12 +55,12 @@ chr22  37118      61175    24057    500      0.0871     1         YES   114
 `TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file) \
 `NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples). Note that this number can be smaller than the number of sequences, because some sequences are droped when they contain too much missing data. \
 
-Next we will see how to use these two files to filter and subset the trees.
+In another tutorial we will see how to use these two files to filter and subset the trees.
 
 ## Inferring trees using likelihood approaches
 
 The `TopoWindows` R functions can only calculate NJ trees internaly. However, when `write.seq = T`, fasta alignments are written for each windows that can be analysed with an external software. The alignements are written in `test_sequences` with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta).
-I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on preference, including Bayesian inference softwares. Here is how to calculate the trees with IQTREE in a UNIX comand line environment:
+I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on your preference, including Bayesian inference softwares. Here is how to calculate the trees with IQTREE in a UNIX comand line environment:
 ```bash:
 cd test_sequences
 
@@ -108,9 +108,20 @@ Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${CHR} --type s --s
 The options are essentially the same as earlier. `type` defines whether to use `topo.windows.sites` (`--type s`) or `topo.windows.coord` (`--type c`).
 This will result in the same output files as previously. 
 
-*Note*: Memory usage will greatly vary depending on chromosome size. To optimize the runs, I recommend to split the small and large chromosome in different runs (because memory specification will be the same for all jobs in the array), and maybe splitting very large chromosomes if run time are too long (only for small windows).
+*Note*: Slurm arrays are fairly flexible and can be adapted to different cases. Here I use them as indices in a variable containing file names, but if your files are named with numbers you can refer to them directly with the ${SLUR_ARRAY_TASK_ID} variable. For exemple, here my files are named `chr1.vcf.gz`, `chr2.vcf.gz` and `chr3.vcf.gz` so I could use the following script:
+```bash:
+#SBATCH [regular Slurm specifications]
+#SBATCH -a 1-3
 
-*Note 2*: If you have a mix of phased and unphased chromosomes (e.g., when sex chromosomes are unphased), you will need to run them separately.
+#Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
+PREF=$(echo chr${SLUR_ARRAY_TaSK_ID}.vcf.gz | cut -d'.' -f1)
+
+Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf chr${SLUR_ARRAY_TaSK_ID}.vcf.gz --type s --size 500 --incr 0 --phased T --nj T --ali T --dist NJ69
+```
+
+*Note 2*: Memory usage will greatly vary depending on chromosome size. To optimize the runs, I recommend to split the small and large chromosome in different runs (because memory specification will be the same for all jobs in the array), and maybe splitting very large chromosomes if run time are too long (it should happen only for small windows).
+
+*Note 3*: If you have a mix of phased and unphased chromosomes (e.g., when sex chromosomes are unphased), you will need to run them separately.
 
 Finally, a similar prallelization strategy may be used to calculate ML trees from the fasta sequences. First, move to the `test_sequences` directory and create a list of the fasta files:
 ```bash:
