@@ -90,5 +90,48 @@ We will use Slurm job arrays to run `topo.windows.sites` on all vcfs simultaneou
 #SBATCH -a 0-2
 ```
 
-This tells slurm to run an array of three jobs with indices 0, 1 and 2. You need to specify as many jobs as you have chromosomes, counting on a 0-basis (here I have three chromosomes, hence). For each job, the index is stored in a variable named ${SLURM_ARRAY_TASK_ID}. We can now use the command line wrapper 
+This tells slurm to run an array of three jobs with indices 0, 1 and 2. You need to specify as many jobs as you have chromosomes, counting on a 0-basis (here I have three chromosomes, hence). For each job, the index is stored in a variable named ${SLURM_ARRAY_TASK_ID}. We can now use the command line wrapper `Topo_windows_v03_cl_wrapper.R` to run the R script from a UNIX command line environment. Here is what jour job file should look like:
+```bash:
+#SBATCH [regular Slurm specifications]
+#SBATCH -a 0-2
+
+#Read the list of chromosomes/contigs into a variable
+CHRLIST=$(<all_vcfs.txt)
+#Identify the current chromosome based on the array ID (starting with 0 because indices are 0-based in bash contrary to e.g. R)
+CHR=${CHRLIST}[${SLURM_ARRAY_TASK_ID}]
+
+#Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
+PREF=$(echo ${CHR} | cut -d'.' -f1)
+
+Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${CHR} --type s --size 500 --incr 0 --phased T --nj T --ali T --dist NJ69
+```
+The options are essentially the same as earlier. `type` defines whether to use `topo.windows.sites` (`--type s`) or `topo.windows.coord` (`--type c`).
+This will result in the same output files as previously. 
+
+*Note*: Memory usage will greatly vary depending on chromosome size. To optimize the runs, I recommend to split the small and large chromosome in different runs (because memory specification will be the same for all jobs in the array), and maybe splitting very large chromosomes if run time are too long (only for small windows).
+
+*Note 2*: If you have a mix of phased and unphased chromosomes (e.g., when sex chromosomes are unphased), you will need to run them separately.
+
+Finally, a similar prallelization strategy may be used to calculate ML trees from the fasta sequences. First, move to the `test_sequences` directory and create a list of the fasta files:
+```bash:
+ls *.fasta > all_fastas.txt
+```
+
+Now, we can use a similar job script as previously (again, assuming three fasta files):
+```bash:
+#SBATCH [regular Slurm specifications]
+#SBATCH -a 0-2
+
+#Read the list of fastas into a variable
+FASTALIST=$(<all_vcfs.txt)
+#Identify the current chromosome based on the array ID (starting with 0 because indices are 0-based in bash contrary to e.g. R)
+FASTA=${FASTALIST}[${SLURM_ARRAY_TASK_ID}]
+
+iqtree2 -s ${FASTA} -m TEST+ASC -T 1
+```
+Once the job is finished, the trees can be concatenated in a single file:
+```bash:
+cat *.treefile > test_ML_trees.trees
+```
+
 
