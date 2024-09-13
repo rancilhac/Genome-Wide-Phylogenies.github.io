@@ -12,19 +12,22 @@ TopoWindows provides two functions for sliding windows `topo.windows.sites` and 
 
 To infer neighbor-joining phylogenies in non-overlapping 500 SNPs windows, run the following:
 ```R:
+
 setwd("TopoWindows_tutorial")
+
 source("Topo_windows_v03.R")
+
 topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "test", 
                    write.seq = T, nj = T, dna.dist = "JC69")
 ```
-For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do:
-`vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped
-`size`: size of the window (number of sites). Note that invariant sites and indels are removed when the vcf is read in (see the documentation of vcfR for more details)
-`incr`: an increment defining overlap across windows (number of sites). 0 means no overlap
-`phased`: whether the data is phased or not. If the data is phased, two sequences are used for each (diploid) samples. If the data is not phased, a consensus sequence is generated with IUPAC ambiguity codes used at heterozygous positions
-`prefix`: a prefix for the output files
-`write.seq`: wether to write multispecies alignments in fasta format for each window
-`dna.dist`: the model to use to calculate distances across sequences. For a complete list of models, see the documentation of the function dist.dna() in the ape package
+For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do: \
+`vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped \
+`size`: size of the window (number of sites). Note that invariant sites and indels are removed when the vcf is read in (see the documentation of vcfR for more details) \
+`incr`: an increment defining overlap across windows (number of sites). 0 means no overlap \
+`phased`: whether the data is phased or not. If the data is phased, two sequences are used for each (diploid) samples. If the data is not phased, a consensus sequence is generated with IUPAC ambiguity codes used at heterozygous positions \
+`prefix`: a prefix for the output files \
+`write.seq`: whether to write multispecies alignments in fasta format for each window. For phased data, the two haplotypes are named `sample_name_0` and `sample_name_1` \
+`dna.dist`: the model to use to calculate distances across sequences. For a complete list of models, see the documentation of the function dist.dna() in the ape package \
 
 Most of these parameters are relatively straighforward to set. The size of the window depends a lot on the aim of the analysis, divergence times across species, the proportion of allele sharing and LD decay. I recommend to try different values and vizualy explore the resulting trees before deciding on a value. Whether to use overlapping windows depend on the question addressed. Typically, phylogenetic inference based on gene trees requires independent markers, and thus overlapping windows won't do. On the other hand, genome scans aimed at detecting fine-scale changes in topological support may benefit from using overlapping windows.
 
@@ -42,23 +45,25 @@ chr22  67         20215    20148    500      0.0772     1         YES   114
 chr22  20275      36961    16686    500      0.0742     1         YES   114
 chr22  37118      61175    24057    500      0.0871     1         YES   114
 ```
-`CHR`: chromosome name
-`CHR.START`: start coordinate
-`CHR.END`: end coordinate
-`CHR.SIZE`: actual size on the chromosome (i.e., CHR.END - CHR.START)
-`NSITES`: number of SNPs in the window
-`PROP.MISS`: proportion of missing genotypes
-`PROP.PIS`: proportion of parcimony-informative SNPs
-`TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file)
-`NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples)
+`CHR`: chromosome name \
+`CHR.START`: start coordinate \
+`CHR.END`: end coordinate \
+`CHR.SIZE`: actual size on the chromosome (i.e., CHR.END - CHR.START) \
+`NSITES`: number of SNPs in the window \
+`PROP.MISS`: proportion of missing genotypes \
+`PROP.PIS`: proportion of parcimony-informative SNPs \
+`TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file) \
+`NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples). Note that this number can be smaller than the number of sequences, because some sequences are droped when they contain too much missing data. \
+
 Next we will see how to use these two files to filter and subset the trees.
 
 ## Inferring trees using likelihood approaches
 
 The `TopoWindows` R functions can only calculate NJ trees internaly. However, when `write.seq = T`, fasta alignments are written for each windows that can be analysed with an external software. The alignements are written in `test_sequences` with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta).
-I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on preference, including Bayesian inference softwares. Here is how to calculate the tree with IQTREE in a UNIX comand line environment:
+I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on preference, including Bayesian inference softwares. Here is how to calculate the trees with IQTREE in a UNIX comand line environment:
 ```bash:
 cd test_sequences
+
 for i in *fasta
 do
 iqtree2 -s ${i} -m TEST+ASC -T 1
@@ -67,5 +72,23 @@ done
 cat *.treefile > test_ML_trees.trees
 ```
 
+The `.trees` file can now be used together with the `.tsv` file produced in the previous step. If you are not interested in getting nj trees, only ML trees, you can run `topo.windows.sites` with `write.seq = T` and `nj = F`. 
 
+## Working in a High-Performance Cluster environment (or parallelizing in a UNIX command line environment)
+
+Working directly in an R environment is not very handy because analyses of large contigs quickly become memory- and time-consuming. Here we will see how to parallelize the runs on a chromosome/contig basis in a High-Performance Cluster with the Slurm job manager. A similar approach can probably be achieved on a UNIX working station with the `parallel` command, although I have never tried.
+
+First, we need to prepare single VCFs for each chromosome/contig and use a consistent naming convention such as `chr1.vcf.gz`, `chr2.vcf.gz`, `chr3.vcf.gz` ect...
+
+Next, we create a text file listing all the input files (one per line):
+```bash:
+ls *.vcf.gz > all_vcfs.txt
+```
+
+We will use Slurm job arrays to run `topo.windows.sites` on all vcfs simultaneously. To do that, create a slurm job script with the specifications corresponding to your cluster. At the end of the header, add the following line:
+```bash:
+#SBATCH -a 0-2
+```
+
+This tells slurm to run an array of three jobs with indices 0, 1 and 2. You need to specify as many jobs as you have chromosomes, counting on a 0-basis (here I have three chromosomes, hence). For each job, the index is stored in a variable named ${SLURM_ARRAY_TASK_ID}. We can now use the command line wrapper 
 
