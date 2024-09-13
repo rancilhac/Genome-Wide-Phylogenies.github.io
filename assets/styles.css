@@ -35,3 +35,36 @@ html, body {
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }	
+
+/* Style for the <pre> element which contains the code block */
+pre {
+    background-color: #f4f4f4; /* Light grey background */
+    padding: 15px;            /* Space inside the box */
+    border-radius: 5px;       /* Rounded corners */
+    overflow-x: auto;         /* Scroll horizontally if needed */
+    margin: 1em 0;            /* Margin around the code block */
+    font-size: 0.9em;         /* Slightly smaller font size */
+}
+
+/* Style for the <code> element which contains the code text */
+code {
+    color: #333;              /* Dark text color */
+    font-family: monospace;  /* Monospace font for code */
+}
+
+/* Optional: Syntax highlighting for specific languages */
+.language-bash {
+    color: #008000; /* Change this to your preferred color for Bash commands */
+}
+
+/* Optional: Style code blocks for other languages */
+.language-python {
+    color: #3572A5; /* Change this to your preferred color for Python */
+}
+
+/* Example of additional customization for inline code */
+code {
+    background-color: #e8e8e8; /* Light grey background for inline code */
+    padding: 2px 4px;         /* Small padding for inline code */
+    border-radius: 3px;       /* Rounded corners for inline code */
+}
