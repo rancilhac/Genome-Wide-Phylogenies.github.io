@@ -61,10 +61,3 @@ code {
 .language-python {
     color: #3572A5; /* Change this to your preferred color for Python */
 }
-
-/* Example of additional customization for inline code */
-code {
-    background-color: #e8e8e8; /* Light grey background for inline code */
-    padding: 2px 4px;         /* Small padding for inline code */
-    border-radius: 3px;       /* Rounded corners for inline code */
-}
