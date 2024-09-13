@@ -1,1 +1,26 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Steps</h2>
+            <ul>
+                <li><a href="/home.md">Home</a></li>
+                <li><a href="/step1.md">Step 1: Introduction</a></li>
+                <li><a href="/step2.md">Step 2: Set Up</a></li>
+                <li><a href="/step3.md">Step 3: Code Example</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            {{ content }}
+        </div>
+    </div>
+</body>
+</html>
