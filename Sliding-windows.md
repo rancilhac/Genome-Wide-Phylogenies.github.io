@@ -2,11 +2,11 @@
 
 In the first part of this tutorial, we will calculate phylogenetic trees in sliding windows along a chromosome.
 
-## Getting started
+### Getting started
 
 This analysis can be run on any system with R installed. Download and install TopoWindows as detailed here: https://github.com/rancilhac/TopoWindows. Create a working directory containing the TopoWindows scripts and your input vcf (or vcfs). The output files will saved there as well.
 
-## Inferring the trees
+### Inferring the trees
 
 TopoWindows provides two functions for sliding windows `topo.windows.sites` and `topo.windows.coord`. The difference is that in the latter the size of the windows is defined in terms of coordinates on the chromosome, while in the former it is defined based on a fixed number of sites. Besides this difference both work essentially in the same way. Whether to use fixed coordinates or number of sites will depend on the aim of the analysis and the dataset (i.e., variations in SNP density). For this exemple, we will use `topo.windows.sites`.
 
@@ -33,7 +33,7 @@ Most of these parameters are relatively straighforward to set. The size of the w
 
 Practical note: the vcf importation into R can take a lot of memory. For very large chromosomes, I sometime had to split the vcfs in several parts.
 
-## Outputs
+### Outputs
 
 Two output files were created:
 `test_NJ_trees.trees`: this file contains the neighbor-joining trees in Newick format, one per line. In case the calculation of the tree fails, NA is printed instead of a tree. It can be opened in a regular phylogenetic tree viewer (e.g., FigTree)
@@ -57,7 +57,7 @@ chr22  37118      61175    24057    500      0.0871     1         YES   114
 
 In another tutorial we will see how to use these two files to filter and subset the trees.
 
-## Inferring trees using likelihood approaches
+### Inferring trees using likelihood approaches
 
 The `TopoWindows` R functions can only calculate NJ trees internaly. However, when `write.seq = T`, fasta alignments are written for each windows that can be analysed with an external software. The alignements are written in `test_sequences` with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta).
 I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on your preference, including Bayesian inference softwares. Here is how to calculate the trees with IQTREE in a UNIX comand line environment:
@@ -74,7 +74,7 @@ cat *.treefile > test_ML_trees.trees
 
 The `.trees` file can now be used together with the `.tsv` file produced in the previous step. If you are not interested in getting nj trees, only ML trees, you can run `topo.windows.sites` with `write.seq = T` and `nj = F`. 
 
-## Working in a High-Performance Cluster environment (or parallelizing in a UNIX command line environment)
+### Working in a High-Performance Cluster environment (or parallelizing in a UNIX command line environment)
 
 Working directly in an R environment is not very handy because analyses of large contigs quickly become memory- and time-consuming. Here we will see how to parallelize the runs on a chromosome/contig basis in a High-Performance Cluster with the Slurm job manager. A similar approach can probably be achieved on a UNIX working station with the `parallel` command, although I have never tried.
 
