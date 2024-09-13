@@ -1,4 +1,4 @@
-# Calculating local phylogenies from whole-genome data: A tutorial
+# Calculating local phylogenies from whole-genome data: A tutorial (changed)
 
 In this page, you will find instruction to calculate local phylogenetic trees based on a vcf from Whole-genome data and perform downstream analyses and vizualizations. Here, local phylogenies refer to phylogenetic trees inferred from specific genomic regions, either arbitrary windows or specific genomic features (genes, exons, ect...). 
 
