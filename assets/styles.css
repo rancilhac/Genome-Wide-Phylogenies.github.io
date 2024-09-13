@@ -52,6 +52,13 @@ code {
     font-family: monospace;  /* Monospace font for code */
 }
 
+/* Optional: Style for inline code */
+code {
+    background-color: #f4f4f4; /* Light grey background for inline code */
+    padding: 2px 4px;         /* Small padding for inline code */
+    border-radius: 3px;       /* Rounded corners for inline code */
+}
+
 /* Optional: Syntax highlighting for specific languages */
 .language-bash {
     color: #008000; /* Change this to your preferred color for Bash commands */
