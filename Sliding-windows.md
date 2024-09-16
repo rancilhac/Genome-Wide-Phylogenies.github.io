@@ -6,7 +6,9 @@ In the first part of this tutorial, we will calculate phylogenetic trees in slid
 
 ### Getting started
 
-This analysis can be run on any system with R installed. Download and install TopoWindows as detailed here: https://github.com/rancilhac/TopoWindows. Create a working directory containing the TopoWindows scripts and your input vcf (or vcfs). The output files will saved there as well.
+For this tutorial, we will use the TopoWindows R functions ([https://github.com/rancilhac/TopoWindows](https://github.com/rancilhac/TopoWindows)), which can be used on any system with R installed. These functions rely on the vcfR package to parse the data and the ape package for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
+
+The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. To get started, create a working directory containing your vcf(s) and the TopoWindows R script, and open an R console.
 
 ### Inferring the trees
 
