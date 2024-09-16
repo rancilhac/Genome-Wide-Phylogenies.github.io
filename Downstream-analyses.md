@@ -47,7 +47,6 @@ trees.rooted <- root.multiPhylo(trees)
 ```
 
 - Plotting the trees:
-
 ```R:
 # plot a single tree:
 plot(trees.rooted[[1]])
@@ -58,10 +57,9 @@ for(i in 1:length(trees.rooted)){
   readline(prompt="Press [enter] to continue")
 }
 ```
-Further plotting options are available in the `plot.phylo()` function, and in the (ggphylo R package)[https://github.com/gjuggler/ggphylo].
+Further plotting options are available in the `plot.phylo()` function, and in the [ggphylo R package](https://github.com/gjuggler/ggphylo).
 
 - Removing tips from the trees:
-
 ```R:
 tips.to.remove <- c("01", "02")
 trees.pruned <- drop.tip.multiphylo(trees.rooted, tips.to.remove)
