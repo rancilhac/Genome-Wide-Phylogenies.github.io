@@ -2,17 +2,17 @@
 title: Calulating phylogenetic trees in sliding windows
 ---
 
-In the first part of this tutorial, we will calculate phylogenetic trees in sliding windows along a chromosome.
-
-### Getting started
+## Getting started
 
 For this tutorial, we will use the TopoWindows R functions ([https://github.com/rancilhac/TopoWindows](https://github.com/rancilhac/TopoWindows)), which can be used on any system with R installed. These functions rely on the vcfR package to parse the data and the ape package for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
 
 The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. To get started, create a working directory containing your vcf(s) and the TopoWindows R script, and open an R console.
 
-### Inferring the trees
+## Inferring the trees
 
-TopoWindows provides two functions for sliding windows `topo.windows.sites` and `topo.windows.coord`. The difference is that in the latter the size of the windows is defined in terms of coordinates on the chromosome, while in the former it is defined based on a fixed number of sites. Besides this difference both work essentially in the same way. Whether to use fixed coordinates or number of sites will depend on the aim of the analysis and the dataset (i.e., variations in SNP density). For this exemple, we will use `topo.windows.sites`.
+In the first part of this tutorial, we will calculate phylogenetic trees in sliding windows along a chromosome.
+
+TopoWindows provides two functions for sliding windows: `topo.windows.sites` and `topo.windows.coord`. The difference is that in the latter the windows are defined in terms of coordinates on the chromosome, while in the former they are defined based on a fixed number of variants. Besides this difference both work essentially in the same way. Whether to use fixed coordinates or number of variants will depend on the aim of the analysis and the dataset (i.e., variations in SNP density). For this exemple, we will use `topo.windows.sites`.
 
 To infer neighbor-joining phylogenies in non-overlapping 500 SNPs windows, run the following:
 ```R:
