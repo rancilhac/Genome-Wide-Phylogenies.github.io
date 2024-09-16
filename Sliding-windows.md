@@ -1,4 +1,6 @@
-# Calulating phylogenetic trees in sliding windows
+---
+title: Calulating phylogenetic trees in sliding windows
+---
 
 In the first part of this tutorial, we will calculate phylogenetic trees in sliding windows along a chromosome.
 
