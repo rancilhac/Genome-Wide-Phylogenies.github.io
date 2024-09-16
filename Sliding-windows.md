@@ -31,7 +31,7 @@ For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the optio
 `phased`: whether the data is phased or not. If the data is phased, two sequences are used for each (diploid) samples. If the data is not phased, a consensus sequence is generated with IUPAC ambiguity codes used at heterozygous positions \
 `prefix`: a prefix for the output files \
 `write.seq`: whether to write multispecies alignments in fasta format for each window. For phased data, the two haplotypes are named `sample_name_0` and `sample_name_1` \
-`dna.dist`: the model to use to calculate distances across sequences. For a complete list of models, see the documentation of the function dist.dna() in the ape package \
+`dna.dist`: the model to use to calculate distances across sequences. For a complete list of models, see the documentation of the function dist.dna() in the ape package
 
 Most of these parameters are relatively straighforward to set. The size of the window depends a lot on the aim of the analysis, divergence times across species, the proportion of allele sharing and LD decay. I recommend to try different values and vizualy explore the resulting trees before deciding on a value. Whether to use overlapping windows depend on the question addressed. Typically, phylogenetic inference based on gene trees requires independent markers, and thus overlapping windows won't do. On the other hand, genome scans aimed at detecting fine-scale changes in topological support may benefit from using overlapping windows.
 
