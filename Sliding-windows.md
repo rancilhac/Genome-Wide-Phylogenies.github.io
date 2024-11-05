@@ -6,9 +6,9 @@ title: Calulating phylogenetic trees in sliding windows
 
 This tutorial shows how to use the [TopoWindows R functions](https://github.com/rancilhac/TopoWindows) to calculate phylogenetic trees in sliding windows and user-defined genomic regions. These functions can be run on any system with R installed, and rely on the vcfR package to parse the data and the ape and phangorn packages for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
 
-The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. In the following exemples I will use a vcf (download link) corresponding to chromosome 20 in Rancilhac et al. (2024), which includes 1,403,718 phased SNPs from 6 species of wagtails (songbirds).
+The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. In the following exemples I will use a vcf ([download link](https://drive.google.com/file/d/1JGOdDQLBWibT8xaSoz4d31fKFJBDQUhF/view?usp=sharing)) corresponding to chromosome 20 in [Rancilhac et al. (2024)](https://academic.oup.com/sysbio/article/73/1/12/7294611), which includes 1,403,718 phased SNPs from 6 species of wagtails (songbirds).
 
-To get started, place the vcf file and Topowindows scripts in a working directory.
+To get started, place the vcf file and Topowindows scripts in a working directory and open an R terminal.
 
 ## Inferring the trees
 
@@ -26,7 +26,7 @@ source("Topo_windows_v03.R")
 topo.windows.sites(vcf = "BWW_chr20.recode.vcf.gz", size = 500, incr = 0, phased = T, prefix = "TW_tutorial", 
                    write.seq = T, tree = "NJ", dna.model = "JC", missing.thresh=0.7, force=F)
 ```
-For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do: \
+With the exemple vcf, it takes a couple of minutes. Here are what the options do: \
 `vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped \
 `size`: size of the window (number of sites). Note that invariant sites and indels are removed when the vcf is read in (see the documentation of vcfR for more details) \
 `incr`: an increment defining overlap across windows (number of sites). 0 means no overlap \
@@ -42,7 +42,7 @@ To use Maximum-likelihood instead of Neighbor-joining, simply change `tree = "NJ
 
 Most of these parameters are relatively straighforward to set. The size of the window depends a lot on the aim of the analysis, divergence times across species, the proportion of allele sharing and LD decay. I recommend to try different values and vizualy explore the resulting trees before deciding on a value. Whether to use overlapping windows depend on the question addressed. Typically, phylogenetic inference based on gene trees requires independent markers, and thus overlapping windows won't do. On the other hand, genome scans aimed at detecting fine-scale changes in topological support may benefit from using overlapping windows.
 
-Practical note: the vcf importation into R can take a lot of memory. For very large chromosomes, it may be helpful to split the vcfs.
+*Note*: the vcf importation into R can take a lot of memory. For very large chromosomes, it may be helpful to split the vcfs.
 
 ### Outputs
 
@@ -66,7 +66,7 @@ chr22  37118      61175    24057    500      0.0871     1         YES   114
 `TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file) \
 `NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples). Note that this number can be smaller than the number of sequences, because some sequences are droped when they contain too much missing data. \
 
-In the next page of this tutorial, we will see how to manipulate these two files to subset the trees and use them in downstream analyses.
+In the next pages of this tutorial, we will see how to manipulate these two files to subset the trees and use them in downstream analyses.
 
 ### Inferring trees using more elaborate approaches
 
@@ -93,7 +93,7 @@ The `.trees` file can now be used together with the `.tsv` file produced in the 
 
 Working directly in an R environment is not very handy because analyses of large contigs quickly become memory- and time-consuming. Here we will see how to parallelize the runs on a chromosome/contig basis in a High-Performance Cluster with the Slurm job manager. A similar approach can probably be achieved on a UNIX working station with the `parallel` command, although I have never tried.
 
-First, we need to prepare single VCFs for each chromosome/contig and use a consistent naming convention such as `chr1.vcf.gz`, `chr2.vcf.gz`, `chr3.vcf.gz` ect... This can easily be achieved with `bcftools 1.18`:
+First, we need to prepare single VCFs for each chromosome/contig and use a consistent naming convention such as `chr1.vcf.gz`, `chr2.vcf.gz`, `chr3.vcf.gz` ect... This can easily be achieved with `bcftools (v1.18)`:
 ```bash:
 # generate a list of all chromosome from original vcf
 bcftools query -f '%CHROM\n' file.vcf | sort | uniq > chromosome_list.txt
@@ -133,7 +133,7 @@ Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${VCF} --type s --s
 The options are essentially the same as earlier. `type` defines whether to use `topo.windows.sites` (`--type s`) or `topo.windows.coord` (`--type c`).
 This will result in the same output files as previously. 
 
-*Note*: Slurm arrays are fairly flexible and can be adapted to different cases. Here I use them as indices in a variable containing file names, but if your files are named with numbers you can refer to them directly with the ${SLUR_ARRAY_TASK_ID} variable. For exemple, here my files are named `chr1.vcf.gz`, `chr2.vcf.gz` and `chr3.vcf.gz` so I could use the following script:
+*Note*: Slurm arrays are fairly flexible and can be adapted to different cases. Here I use them as indices to pick file names in a bash array, but if your files are named with numbers you can refer to them directly with the ${SLURM_ARRAY_TASK_ID} variable. For exemple, here my files are named `chr1.vcf.gz`, `chr2.vcf.gz` and `chr3.vcf.gz` so I could use the following script:
 ```bash:
 #SBATCH [regular Slurm specifications]
 #SBATCH -a 1-3
