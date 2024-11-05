@@ -23,7 +23,7 @@ setwd("TopoWindows_tutorial")
 
 source("Topo_windows_v03.R")
 
-topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "TW_tutorial", 
+topo.windows.sites(vcf = "BWW_chr20.recode.vcf.gz", size = 500, incr = 0, phased = T, prefix = "TW_tutorial", 
                    write.seq = T, tree = "NJ", dna.model = "JC", missing.thresh=0.7, force=F)
 ```
 For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do: \
@@ -68,28 +68,42 @@ chr22  37118      61175    24057    500      0.0871     1         YES   114
 
 In the next page of this tutorial, we will see how to manipulate these two files to subset the trees and use them in downstream analyses.
 
-### Inferring trees using likelihood approaches
+### Inferring trees using more elaborate approaches
 
-The `TopoWindows` R functions can only calculate NJ trees internaly. However, when `write.seq = T`, fasta alignments are written for each windows that can be analysed with an external software. The alignements are written in `test_sequences` with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta).
-I tend to use IQTREE for maximum-likelihood phylogenetic inference, but other softwares can also be used (e.g., RAxML) depending on your preference, including Bayesian inference softwares. Here is how to calculate the trees with IQTREE in a UNIX comand line environment:
+The phylogenetic methods implemented in `TopoWindows` are fairly simple and most appropriate for time efficient inference of a large number of trees in closely related species. In some cases, more elaborated inference may be needed. This can be done based on the fasta alignments written for each windows with the `write.seq = T` option. Alignements are written in the `TW_tutorial_sequences` directory with names like `chr22-67-20215.fasta`(CHR-CHR.START-CHR.END.fasta), and can be fed into any phylogenetic inference softwares that accept fasta as input format. Here is an exemple with IQTREE 2 (ML inference) with two threads and 1000 bootstrap replicates:
+
 ```bash:
 cd test_sequences
 
 for i in *fasta
 do
-iqtree2 -s ${i} -m TEST+ASC -T 1
+iqtree2 -s ${i} -m TEST+ASC -T 2 -B 1000
+if [ -f ${i}.treefile ]
+then
+cat ${i}.treefile >> ML_trees_IQTREE.trees
+else
+echo "NA" >> ML_trees_IQTREE.trees
+fi
 done
-
-cat *.treefile > test_ML_trees.trees
 ```
 
-The `.trees` file can now be used together with the `.tsv` file produced in the previous step. If you are not interested in getting nj trees, only ML trees, you can run `topo.windows.sites` with `write.seq = T` and `nj = F`. 
+The `.trees` file can now be used together with the `.tsv` file produced in the previous step.
 
 ### Working in a High-Performance Cluster environment (or parallelizing in a UNIX command line environment)
 
 Working directly in an R environment is not very handy because analyses of large contigs quickly become memory- and time-consuming. Here we will see how to parallelize the runs on a chromosome/contig basis in a High-Performance Cluster with the Slurm job manager. A similar approach can probably be achieved on a UNIX working station with the `parallel` command, although I have never tried.
 
-First, we need to prepare single VCFs for each chromosome/contig and use a consistent naming convention such as `chr1.vcf.gz`, `chr2.vcf.gz`, `chr3.vcf.gz` ect...
+First, we need to prepare single VCFs for each chromosome/contig and use a consistent naming convention such as `chr1.vcf.gz`, `chr2.vcf.gz`, `chr3.vcf.gz` ect... This can easily be achieved with `bcftools 1.18`:
+```bash:
+# generate a list of all chromosome from original vcf
+bcftools query -f '%CHROM\n' file.vcf | sort | uniq > chromosome_list.txt
+
+# 
+while read CHR
+do
+bcftools view -r ${CHR} -O z -o ${CHR}.vcf.gz file.vcf
+done < chromosome_list.txt
+```
 
 Next, we create a text file listing all the input files (one per line):
 ```bash:
@@ -107,14 +121,14 @@ This tells slurm to run an array of three jobs with indices 0, 1 and 2. You need
 #SBATCH -a 0-2
 
 #Read the list of chromosomes/contigs into a variable
-CHRLIST=$(<all_vcfs.txt)
+VCFLIST=$(<all_vcfs.txt)
 #Identify the current chromosome based on the array ID (starting with 0 because indices are 0-based in bash contrary to e.g. R)
-CHR=${CHRLIST}[${SLURM_ARRAY_TASK_ID}]
+VCF=${VCFLIST}[${SLURM_ARRAY_TASK_ID}]
 
 #Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
 PREF=$(echo ${CHR} | cut -d'.' -f1)
 
-Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${CHR} --type s --size 500 --incr 0 --phased T --nj T --ali T --dist NJ69
+Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${VCF} --type s --size 500 --incr 0 --phased T --tree NJ --ali T --dna-model NJ --force F --missingness 0.7
 ```
 The options are essentially the same as earlier. `type` defines whether to use `topo.windows.sites` (`--type s`) or `topo.windows.coord` (`--type c`).
 This will result in the same output files as previously. 
@@ -127,14 +141,14 @@ This will result in the same output files as previously.
 #Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
 PREF=$(echo chr${SLUR_ARRAY_TASK_ID}.vcf.gz | cut -d'.' -f1)
 
-Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf chr${SLUR_ARRAY_TaSK_ID}.vcf.gz --type s --size 500 --incr 0 --phased T --nj T --ali T --dist NJ69
+Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${VCF} --type s --size 500 --incr 0 --phased T --tree NJ --ali T --dna-model NJ --force F --missingness 0.7
 ```
 
 *Note 2*: Memory usage will greatly vary depending on chromosome size. To optimize the runs, I recommend to split the small and large chromosome in different runs (because memory specification will be the same for all jobs in the array), and maybe splitting very large chromosomes if run time are too long (it should happen only for small windows).
 
 *Note 3*: If you have a mix of phased and unphased chromosomes (e.g., when sex chromosomes are unphased), you will need to run them separately.
 
-Finally, a similar prallelization strategy may be used to calculate ML trees from the fasta sequences. First, move to the `test_sequences` directory and create a list of the fasta files:
+Finally, a similar prallelization strategy may be used to calculate ML trees from the fasta sequences. First, move to the `TW_tutorial_sequences` directory and create a list of the fasta files:
 ```bash:
 ls *.fasta > all_fastas.txt
 ```
@@ -155,5 +169,6 @@ Once the job is finished, the trees can be concatenated in a single file:
 ```bash:
 cat *.treefile > test_ML_trees.trees
 ```
+*Note*: Slurm arrays are limited to 999, so this will require a bit of adaptation for large numbers of windows.
 
 
