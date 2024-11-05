@@ -26,7 +26,7 @@ source("Topo_windows_v03.R")
 topo.windows.sites(vcf = "BWW_chr20.recode.vcf.gz", size = 500, incr = 0, phased = T, prefix = "TW_tutorial", 
                    write.seq = T, tree = "NJ", dna.model = "JC", missing.thresh=0.7, force=F)
 ```
-With the exemple vcf, it takes a couple of minutes. Here are what the options do: \
+With the exemple vcf (1.4 Million SNPs), it takes ~11 minutes on my laptop. Here are what the options do: \
 `vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped \
 `size`: size of the window (number of sites). Note that invariant sites and indels are removed when the vcf is read in (see the documentation of vcfR for more details) \
 `incr`: an increment defining overlap across windows (number of sites). 0 means no overlap \
@@ -51,15 +51,17 @@ Two output files were created:
 `TW_tutorial_windows_stats.tsv`: this file is a tab-separated table containing metadata for each window on a separate line
 
 ```
-CHR    CHR.START  CHR.END  CHR.SIZE  NSITES  PROP.MISS  PROP.PIS  TREE  NTIPS
-chr22  67         20215    20148    500      0.0772     1         YES   114
-chr22  20275      36961    16686    500      0.0742     1         YES   114
-chr22  37118      61175    24057    500      0.0871     1         YES   114
+CHR     CHR.START  CHR.END  CHR.SIZE  NSITES  PROP.MISS  PROP.PIS  TREE    NTIPS
+chr20   2972       164561   161589    500     0.1147    0.148      YES     58
+chr20   164563     169043   4480      500     0.0312    0.098      YES     58
+chr20   169062     173762   4700      500     0.0292    0.082      YES     58
+chr20   173834     179341   5507      500     0.0523    0.096      YES     58
+
 ```
 `CHR`: chromosome name \
 `CHR.START`: start coordinate \
 `CHR.END`: end coordinate \
-`CHR.SIZE`: actual size on the chromosome (i.e., CHR.END - CHR.START) \
+`CHR.SIZE`: actual size on the chromosome (i.e., `CHR.END - CHR.START`) \
 `NSITES`: number of SNPs in the window \
 `PROP.MISS`: proportion of missing genotypes \
 `PROP.PIS`: proportion of parcimony-informative SNPs \
