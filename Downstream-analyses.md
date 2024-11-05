@@ -1,8 +1,8 @@
 ---
-title: Trees exploration and downstream analyses
+title: Trees manipulation and exploration
 ---
 
-Now that we have calculated the trees, we can explore them and use them for downstream phylogenetic analyses. Here, we will see how to filter the trees based on the windows metadata, visualize the trees and run downstream phylogenetic analyses.
+Now that we have a set of trees, we can manipulate, filter and vizualize them before using them for downstream analyses. The ape package offers many functionalities for that.
 
 ## Filtering the trees
 
