@@ -4,9 +4,11 @@ title: Calulating phylogenetic trees in sliding windows
 
 ## Getting started
 
-For this tutorial, we will use the TopoWindows R functions ([https://github.com/rancilhac/TopoWindows](https://github.com/rancilhac/TopoWindows)), which can be used on any system with R installed. These functions rely on the vcfR package to parse the data and the ape package for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
+This tutorial shows how to use the TopoWindows R functions ([https://github.com/rancilhac/TopoWindows](https://github.com/rancilhac/TopoWindows)) to calculate phylogenetic trees in sliding windows and user-defined genomic regions. These functions can be run on any system with R installed, and rely on the vcfR package to parse the data and the ape and phangorn packages for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
 
-The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. To get started, create a working directory containing your vcf(s) and the TopoWindows R script, and open an R console.
+The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. In the following exemples I will use a vcf (download link) corresponding to chromosome 20 in Rancilhac et al. (2024), which includes 1,403,718 phased SNPs from 6 species of wagtails (songbirds).
+
+To get started, place the vcf file and Topowindows scripts in a working directory.
 
 ## Inferring the trees
 
@@ -21,7 +23,7 @@ setwd("TopoWindows_tutorial")
 
 source("Topo_windows_v03.R")
 
-topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "test", 
+topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "tutorial", 
                    write.seq = T, nj = T, dna.dist = "JC69")
 ```
 For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do: \
