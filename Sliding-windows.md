@@ -36,7 +36,7 @@ For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the optio
 `tree`: whether to calulate trees. Can be "NJ" (neighbor-joining trees), "ML" (Maximum-likelihood trees) or "N" (no trees). \
 `dna.model`: the nucleotide substitution model to use. When calculating NJ trees, this correspond to the models available to the dist.dna() function in ape. \
 `missing.thresh`: At a given window, sequences will be remove if their proportion of missing SNPs is above the specified threshold. \
-`force`: whether to overwrite pre-existing output files with the same prefix. \
+`force`: whether to overwrite pre-existing output files with the same prefix.
 
 To use Maximum-likelihood instead of Neighbor-joining, simply change `tree = "NJ"` to `tree = "ML"`. The ML approach implemented is very simple (no bootstraping, no optimization of substitution model), but more elaborate inference can also be performed if needed, as discussed at the end of this page.
 
@@ -120,7 +120,7 @@ This tells slurm to run an array of three jobs with indices 0, 1 and 2. You need
 #SBATCH [regular Slurm specifications]
 #SBATCH -a 0-2
 
-#Read the list of chromosomes/contigs into a variable
+#Read the list of single-chromosome vcf files
 VCFLIST=$(<all_vcfs.txt)
 #Identify the current chromosome based on the array ID (starting with 0 because indices are 0-based in bash contrary to e.g. R)
 VCF=${VCFLIST}[${SLURM_ARRAY_TASK_ID}]
@@ -139,9 +139,9 @@ This will result in the same output files as previously.
 #SBATCH -a 1-3
 
 #Define a prefix for the output files (adapt to your naming convention, here it takes all the vcf file name before .vcf.gz)
-PREF=$(echo chr${SLUR_ARRAY_TASK_ID}.vcf.gz | cut -d'.' -f1)
+PREF=$(echo chr${SLURM_ARRAY_TASK_ID}.vcf.gz | cut -d'.' -f1)
 
-Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf ${VCF} --type s --size 500 --incr 0 --phased T --tree NJ --ali T --dna-model NJ --force F --missingness 0.7
+Rscript Topo_windows_v03_cl_wrapper.R --prefix ${PREF} --vcf chr${SLURM_ARRAY_TASK_ID}.vcf.gz --type s --size 500 --incr 0 --phased T --tree NJ --ali T --dna-model NJ --force F --missingness 0.7
 ```
 
 *Note 2*: Memory usage will greatly vary depending on chromosome size. To optimize the runs, I recommend to split the small and large chromosome in different runs (because memory specification will be the same for all jobs in the array), and maybe splitting very large chromosomes if run time are too long (it should happen only for small windows).
@@ -169,6 +169,6 @@ Once the job is finished, the trees can be concatenated in a single file:
 ```bash:
 cat *.treefile > test_ML_trees.trees
 ```
-*Note*: Slurm arrays are limited to 999, so this will require a bit of adaptation for large numbers of windows.
+*Note*: Slurm arrays are limited to 999, so this will require a bit of adaptation for larger numbers of windows.
 
 
