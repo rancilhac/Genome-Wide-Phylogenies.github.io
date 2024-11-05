@@ -6,23 +6,38 @@ Now that we have a set of trees, we can manipulate, filter and vizualize them be
 
 ## Filtering the trees
 
-First, let's import the trees and windows metadata in R. 
+First, let's import the windows metadata in R: 
 
+```R:
+# the metadata are read as a table, with one genomic window per line
+metadata <- read.table("TW_tutorial_windows_stats.tsv", header=T)
+
+dim(metadata)
+> [1] 2808    9
+
+head(metadata)
+>    CHR CHR.START CHR.END CHR.SIZE NSITES PROP.MISS PROP.PIS TREE NTIPS
+1 chr20      2972  164561   161589    500    0.1147    0.148  YES    58
+2 chr20    164563  169043     4480    500    0.0312    0.098  YES    58
+3 chr20    169062  173762     4700    500    0.0292    0.082  YES    58
+4 chr20    173834  179341     5507    500    0.0523    0.096  YES    58
+5 chr20    179345  184187     4842    500    0.0356    0.084  YES    58
+6 chr20    184191  189102     4911    500    0.0420    0.092  YES    58
+```
+Next, we can import the trees with the `read.tree()` function. This creates a `multiPhylo` object, which is essentially a list of phylogenetic trees and can be manipulated as a regular list in R:
 ```R:
 library(ape)
 
-# the metadata are read as a table, with one genomic window per line
-metadata <- read.table("test_windows_stats.tsv", header=T)
-
-# the trees are imported as a multiPhylo object of the ape package, which functions like a list
-trees <- read.tree("test_NJ_trees.trees")
+trees <- read.tree("TW_tutorial.trees")
+trees
+>2808 phylogenetic trees
 ```
-The two files should have the same number of lines, corresponding to the number of windows. However, the lines containing `NA` in the trees file (i.e., windows where the phylogenetic analysis failed) are not read by the `read.tree()` function, hence these windows must be removed from metadata table as well.
+There should be as many lines in the `metadata` table as items in the `trees` object. However, phylogenetic inference may fail in some windows, in which case `NA` is written in both the `TREE` column of the `metadata` file and in the corresponding line of the `trees` file. These lines are not recognised by `read.tree()`, meaning that `trees` will have less items than rows in `metadata`. This can be corrected using the following:
 
 ```R:
 metadata <- na.omit(metadata)
-nrows(metadata)
-length(trees)
+nrow(metadata) == length(trees)
+>[1] TRUE
 ```
 If after removing the `NA` the number of windows and trees still don't match, then something went wrong in the previous step. If they match, we can continue.
 
