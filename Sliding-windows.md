@@ -4,7 +4,7 @@ title: Calulating phylogenetic trees in sliding windows
 
 ## Getting started
 
-This tutorial shows how to use the TopoWindows R functions ([https://github.com/rancilhac/TopoWindows](https://github.com/rancilhac/TopoWindows)) to calculate phylogenetic trees in sliding windows and user-defined genomic regions. These functions can be run on any system with R installed, and rely on the vcfR package to parse the data and the ape and phangorn packages for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
+This tutorial shows how to use the [TopoWindows R functions](https://github.com/rancilhac/TopoWindows) to calculate phylogenetic trees in sliding windows and user-defined genomic regions. These functions can be run on any system with R installed, and rely on the vcfR package to parse the data and the ape and phangorn packages for phylogenetic analyses and tree output. Further information can be found in the TopoWindows github repository.
 
 The only input file needed is a vcf file containing single nucleotide variants from a single chromosome/contig. Variants can be phased or not, and the vcf can also contain invariant sites and indels, but those will be removed when the vcf is imported into R. The vcf file can be gziped. In the following exemples I will use a vcf (download link) corresponding to chromosome 20 in Rancilhac et al. (2024), which includes 1,403,718 phased SNPs from 6 species of wagtails (songbirds).
 
@@ -23,8 +23,8 @@ setwd("TopoWindows_tutorial")
 
 source("Topo_windows_v03.R")
 
-topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "tutorial", 
-                   write.seq = T, nj = T, dna.dist = "JC69")
+topo.windows.sites(vcf = "YW_ASTRAL_PHASED_57i_CHR23.recode.vcf", size = 500, incr = 0, phased = T, prefix = "TW_tutorial", 
+                   write.seq = T, tree = "NJ", dna.model = "JC", missing.thresh=0.7, force=F)
 ```
 For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the options do: \
 `vcf`: name of the vcf file (or full path if it is not in the working directory), can be gziped \
@@ -32,18 +32,23 @@ For a vcf with 87000 SNPs, it takes a couple of minutes. Here are what the optio
 `incr`: an increment defining overlap across windows (number of sites). 0 means no overlap \
 `phased`: whether the data is phased or not. If the data is phased, two sequences are used for each (diploid) samples. If the data is not phased, a consensus sequence is generated with IUPAC ambiguity codes used at heterozygous positions \
 `prefix`: a prefix for the output files \
-`write.seq`: whether to write multispecies alignments in fasta format for each window. For phased data, the two haplotypes are named `sample_name_0` and `sample_name_1` \
-`dna.dist`: the model to use to calculate distances across sequences. For a complete list of models, see the documentation of the function dist.dna() in the ape package
+`write.seq`: whether to write multispecies alignments in fasta format for each window. For phased data, the two haplotypes are named `sample_name_0` and `sample_name_1`. \
+`tree`: whether to calulate trees. Can be "NJ" (neighbor-joining trees), "ML" (Maximum-likelihood trees) or "N" (no trees). \
+`dna.model`: the nucleotide substitution model to use. When calculating NJ trees, this correspond to the models available to the dist.dna() function in ape. \
+`missing.thresh`: At a given window, sequences will be remove if their proportion of missing SNPs is above the specified threshold. \
+`force`: whether to overwrite pre-existing output files with the same prefix. \
+
+To use Maximum-likelihood instead of Neighbor-joining, simply change `tree = "NJ"` to `tree = "ML"`. The ML approach implemented is very simple (no bootstraping, no optimization of substitution model), but more elaborate inference can also be performed if needed, as discussed at the end of this page.
 
 Most of these parameters are relatively straighforward to set. The size of the window depends a lot on the aim of the analysis, divergence times across species, the proportion of allele sharing and LD decay. I recommend to try different values and vizualy explore the resulting trees before deciding on a value. Whether to use overlapping windows depend on the question addressed. Typically, phylogenetic inference based on gene trees requires independent markers, and thus overlapping windows won't do. On the other hand, genome scans aimed at detecting fine-scale changes in topological support may benefit from using overlapping windows.
 
-Practical note: the vcf importation into R can take a lot of memory. For very large chromosomes, I sometime had to split the vcfs in several parts.
+Practical note: the vcf importation into R can take a lot of memory. For very large chromosomes, it may be helpful to split the vcfs.
 
 ### Outputs
 
 Two output files were created:
-`test_NJ_trees.trees`: this file contains the neighbor-joining trees in Newick format, one per line. In case the calculation of the tree fails, NA is printed instead of a tree. It can be opened in a regular phylogenetic tree viewer (e.g., FigTree)
-`test_windows_stats.tsv`: this file is a tab-separated table containing metadata for each window on a separate line
+`TW_tutorial.trees`: this file contains the neighbor-joining trees in Newick format, one per line. In case the calculation of the tree fails, NA is printed instead of a tree. It can be opened in a regular phylogenetic tree viewer (e.g., FigTree)
+`TW_tutorial_windows_stats.tsv`: this file is a tab-separated table containing metadata for each window on a separate line
 
 ```
 CHR    CHR.START  CHR.END  CHR.SIZE  NSITES  PROP.MISS  PROP.PIS  TREE  NTIPS
@@ -61,7 +66,7 @@ chr22  37118      61175    24057    500      0.0871     1         YES   114
 `TREE`: whether a NJ tree could be calculated (if not, `NA` in this column and in the `.trees` file) \
 `NTIPS`: the number of tips in the tree (here twice the number of samples since the vcf contains phased diploid individuals, for unphased data it should be the number of samples). Note that this number can be smaller than the number of sequences, because some sequences are droped when they contain too much missing data. \
 
-In another tutorial we will see how to use these two files to filter and subset the trees.
+In the next page of this tutorial, we will see how to manipulate these two files to subset the trees and use them in downstream analyses.
 
 ### Inferring trees using likelihood approaches
 
