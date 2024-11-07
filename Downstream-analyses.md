@@ -67,10 +67,9 @@ trees.rooted <- root.multiPhylo(trees)
 plot(trees.rooted[[1]])
 
 # plot all trees one after the other (press "enter" to see the next and "escape" to exit)
-for(i in 1:length(trees.rooted)){
+for(i in 1:length(trees.rooted))
   plot(trees.rooted[[i]])
   readline(prompt="Press [enter] to continue")
-}
 ```
 Further plotting options are available in the `plot.phylo()` function, and in the [ggphylo R package](https://github.com/gjuggler/ggphylo).
 
