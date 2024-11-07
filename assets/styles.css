@@ -47,7 +47,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }	
 
-/* Style for the <pre> element which contains the code block */
+/* Style block-level code (within <pre> tags) */
 pre {
     background-color: #f4f4f4;
     padding: 15px;
@@ -55,25 +55,23 @@ pre {
     overflow-x: auto;
     margin: 1em 0;
     font-size: 0.9em;
-    white-space: pre-wrap; /* Ensures whitespace is preserved */
+    white-space: pre-wrap;
 }
 
-code {
-    display: block; /* Ensures block formatting for code */
-    white-space: pre; /* Maintains code indentation and line breaks */
+/* Ensure block-level code within <pre> tags takes the full width */
+pre code {
+    display: block;
+    white-space: pre;
 }
 
-/* Style for the <code> element which contains the code text */
+/* Style inline code */
 code {
-    color: #333;              /* Dark text color */
-    font-family: monospace;  /* Monospace font for code */
-}
-
-/* Optional: Style for inline code */
-code {
-    background-color: #f4f4f4; /* Light grey background for inline code */
-    padding: 2px 4px;         /* Small padding for inline code */
-    border-radius: 3px;       /* Rounded corners for inline code */
+    display: inline;          /* Inline display for code within text */
+    background-color: #f4f4f4; /* Light background */
+    padding: 2px 4px;          /* Small padding around inline code */
+    border-radius: 3px;        /* Rounded corners */
+    font-size: 0.9em;          /* Slightly smaller font */
+    white-space: nowrap;       /* Prevents wrapping in the middle of inline code */
 }
 
 /* Optional: Syntax highlighting for specific languages */
