@@ -58,7 +58,7 @@ By default, ASTRAL measures node support using a local posterior probability. It
 java -jar ./ASTRAL/Astral/astral.5.7.8.jar -t 1 -i TW_tutorial.trees -o ASTRAL_result_q1.tre
 
 # print quartet score for the three possible quartets at each node
-java -jar ./ASTRAL/Astral/astral.5.7.8.jar -t 8 -i TW_tutorial.trees -o ASTRAL_result_q1.tre
+java -jar ./ASTRAL/Astral/astral.5.7.8.jar -t 8 -i TW_tutorial.trees -o ASTRAL_result_q3.tre
 ```
 
 For other ASTRAL functionnalities (including a polytomy test which can be very interesting), see ASTRAL's manual.
