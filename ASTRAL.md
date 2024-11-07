@@ -51,6 +51,8 @@ ASTRAL is very simple to run and only requires to have java installed on your co
 java -jar ./ASTRAL/Astral/astral.5.7.8.jar -i TW_tutorial.trees -o ASTRAL_result.tre
 ```
 
+The resulting tree may be open and displayed in R or any software for phylogenetic tree vizualization.
+
 By default, ASTRAL measures node support using a local posterior probability. It offers other measures of support which are described in the manual. One that is useful is the quartet support, which indicates the amount of gene tree discordance at each node:
 
 ```bash:
