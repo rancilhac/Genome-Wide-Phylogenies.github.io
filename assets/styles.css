@@ -49,12 +49,18 @@ body {
 
 /* Style for the <pre> element which contains the code block */
 pre {
-    background-color: #f4f4f4; /* Light grey background */
-    padding: 15px;            /* Space inside the box */
-    border-radius: 5px;       /* Rounded corners */
-    overflow-x: auto;         /* Scroll horizontally if needed */
-    margin: 1em 0;            /* Margin around the code block */
-    font-size: 0.9em;         /* Slightly smaller font size */
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-size: 0.9em;
+    white-space: pre-wrap; /* Ensures whitespace is preserved */
+}
+
+code {
+    display: block; /* Ensures block formatting for code */
+    white-space: pre; /* Maintains code indentation and line breaks */
 }
 
 /* Style for the <code> element which contains the code text */
