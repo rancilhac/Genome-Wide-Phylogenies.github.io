@@ -24,6 +24,17 @@ html, body {
     overflow-y: auto; /* Add scroll if the content overflows */
 }
 
+/* Style list items within the sidebar */
+.sidebar ul {
+    list-style-type: none; /* Remove bullets */
+    padding: 0;            /* Remove default padding */
+    margin: 0;             /* Remove default margin */
+}
+
+.sidebar ul li {
+    margin-bottom: 15px;   /* Adjust this value for more or less spacing */
+}
+
 /* Content styling */
 .content {
     margin-left: 220px; /* Adjust to the width of the sidebar */
