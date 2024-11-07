@@ -13,5 +13,31 @@ ASTRAL takes as input a set of gene trees in newick format, concatenated in a si
 
 We can filter the trees as shown in the previous page:
 
+```R:
 
+metadata <- read.table("TW_tutorial_windows_stats.tsv", header=T)
+trees <- read.tree("TW_tutorial.trees")
+
+# this is a custom function to thin the windows based on the desired physical size
+thin.pos <- function(pos, start, interval){
+  thinned.pos <- c(start)
+  p <- pos[start]
+  i <- 2
+  while(i <= length(pos)){
+    if(pos[i]-p >= interval){ thinned.pos <- c(thinned.pos, i)
+    p <- pos[i]
+    i <- i+1 }
+    else if(pos[i]-p < interval){ i <- i+1 }
+  }
+  return(thinned.pos)
+}
+
+# first we select windows with less than 40% missing data and a physical size of 15 kbp
+metadata.ASTRAL <- metadata[which(metadata$PROP.MISS < 0.4 & metadata$CHR.SIZE < 15000), ]
+# next, we thin the windows so that they are separated by at least 25kbp
+metadata.ASTRAL <- metadata.ASTRAL[thin.ranges(metadata.ASTRAL[,2:3], 25000), ]
+
+trees.ASTRAL <- trees[as.numeric(riow.names(metadata.ASTRAL))]
+write.tree(trees.ASTRAL, "TW_tutorial_ASTRAL.trees")
+```
 
