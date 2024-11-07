@@ -55,13 +55,15 @@ A similar approach can be used to filter the windows based on the different colu
 
 Visualy inspecting the trees can be useful to detect problems or get a first idea of the signal in the data. It can also be interesting to edit the trees, for exemple to drop some samples before further analyses. `ape` provides some useful tools for that.
 
-- Rooting the trees: 
+- Rooting the trees:
+  
 ```R:
 outgroup <- c("01", "02")
 trees.rooted <- root.multiPhylo(trees)
 ```
 
 - Plotting the trees:
+  
 ```R:
 # plot a single tree:
 plot(trees.rooted[[1]])
@@ -69,7 +71,6 @@ plot(trees.rooted[[1]])
 # plot all trees one after the other (press "enter" to see the next and "escape" to exit)
 for(i in 1:length(trees.rooted))
   plot(trees.rooted[[i]])
-  readline(prompt="Press [enter] to continue")
 ```
 Further plotting options are available in the `plot.phylo()` function, and in the [ggphylo R package](https://github.com/gjuggler/ggphylo).
 
