@@ -40,4 +40,25 @@ metadata.ASTRAL <- metadata.ASTRAL[thin.ranges(metadata.ASTRAL[,2:3], 25000), ]
 trees.ASTRAL <- trees[as.numeric(riow.names(metadata.ASTRAL))]
 write.tree(trees.ASTRAL, "TW_tutorial_ASTRAL.trees")
 ```
+When working on several chromosomes, one can loop over this script to apply the filters to each chromosome, and use the `write.tree()` option `append=T` to write all the trees to a single file. As a general rule, I would say that autosomes and sex chromosomes are best considered separately, because they tend to support distinct evolutionary histories. Organelles (e.g., mitochondrion) should not be included.
 
+## Inferring a phylogeny with ASTRAL
+
+ASTRAL is very simple to run and only requires to have java installed on your computer. Once you've installed the dependencies and downloaded ASTRAL, you can run it with the following command:
+
+```bash:
+# change the path to where the ASTRAL directory is located in your system and which version you are using 
+java -jar ./ASTRAL/Astral/astral.5.7.8.jar -i TW_tutorial.trees -o ASTRAL_result.tre
+```
+
+By default, ASTRAL measures node support using a local posterior probability. It offers other measures of support which are described in the manual. One that is useful is the quartet support, which indicates the amount of gene tree discordance at each node:
+
+```bash:
+# print quartet score for the most common quartet at each node
+java -jar ./ASTRAL/Astral/astral.5.7.8.jar -t 1 -i TW_tutorial.trees -o ASTRAL_result_q1.tre
+
+# print quartet score for the three possible quartets at each node
+java -jar ./ASTRAL/Astral/astral.5.7.8.jar -t 8 -i TW_tutorial.trees -o ASTRAL_result_q1.tre
+```
+
+For other ASTRAL functionnalities (including a polytomy test which can be very interesting), see ASTRAL's manual.
