@@ -40,5 +40,5 @@ The complete sample map for the exemple data set can be downloaded [here](https:
 
 Now let's run TWISST:
 ```bash:
-python twisst.py -t TW_tutorial_TWISST.trees -w TWISST.weights -o TWISST.topologies --outgroup Mot_cin_outgroup --method complete -g Mot_agu -g Mot_alb -g Mot_gra -g Mot_sam -g Mot_mad -g Mot_cin_outgroup --groupsFile samples_map.txt
+python twisst.py -t TW_tutorial_TWISST.trees -w TWISST.weights --outputTopos TWISST.topologies --outgroup Mot_cin_outgroup --method complete -g Mot_agu -g Mot_alb -g Mot_gra -g Mot_sam -g Mot_mad -g Mot_cin_outgroup --groupsFile samples_map.txt
 ```
