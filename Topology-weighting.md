@@ -42,3 +42,18 @@ Now let's run TWISST:
 ```bash:
 python twisst.py -t TW_tutorial_TWISST.trees -w TWISST.weights --outputTopos TWISST.topologies --outgroup Mot_cin_outgroup --method complete -g Mot_agu -g Mot_alb -g Mot_gra -g Mot_sam -g Mot_mad -g Mot_cin_outgroup --groupsFile samples_map.txt
 ```
+TWISST outputs two files: `TWISST.topologies` contains a list of all possible species tree topologies, in parenthetical format; `TWISST.weights` is a table containing the weights (as well as the list of topologies at the beggining of the file). In the weights table each column is a topology and each line a gene tree. The value in a cell is the number of subtree of a given gene tree that match a given species tree. As usual, we will import this data into R to explore the results and do some vizualization.
+
+```R:
+weights <- read.table("TWISST.weights", header=T)
+
+# TWISST gives raw weights, but proportions are easier to interpret (i.e., the proportion of subtrees supporting a topology, rather than the raw number of subtrees). Let's first convert counts into proportions:
+
+prop.weight <- function(raw){raw/apply(raw, 1, sum)}
+weights <- prop.weight(weights)
+
+# Now we can calculate the mean weight for each topology
+
+mean.weight <- apply(weights, 2, mean)
+barplot(mean.weight[order(mean.weight)], ylab="Mean weight")
+```
