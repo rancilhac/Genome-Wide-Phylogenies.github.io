@@ -37,9 +37,12 @@ html, body {
 
 /* Content styling */
 .content {
-    margin-left: 220px; /* Adjust to the width of the sidebar */
+    margin-left: 220px; /* Keep space for the sidebar */
     padding: 20px;
     flex-grow: 1; /* Content takes remaining width */
+    max-width: 1000px; /* Limit the maximum width of the content */
+    width: 100%; /* Allow content to shrink on smaller screens */
+    box-sizing: border-box; /* Include padding in the total width */
 }
 
 /* Optional: To keep a uniform font across the page */
