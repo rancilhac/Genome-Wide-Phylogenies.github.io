@@ -42,7 +42,7 @@ Now let's run TWISST:
 ```bash:
 python twisst.py -t TW_tutorial_TWISST.trees -w TWISST.weights --outputTopos TWISST.topologies --outgroup Mot_cin_outgroup --method complete -g Mot_agu -g Mot_alb -g Mot_gra -g Mot_sam -g Mot_mad -g Mot_cin_outgroup --groupsFile samples_map.txt
 ```
-## Results vizualisation
+## Vizualizing the results: summaries of all gene trees
 
 TWISST outputs two files: `TWISST.topologies` contains a list of all possible species tree topologies, in parenthetical format; `TWISST.weights` is a table containing the weights (as well as the list of topologies at the beggining of the file). In the weights table each column is a topology and each line a gene tree. The value in a cell is the number of subtree of a given gene tree that match a given species tree. Here is a simple example with three gene trees and three species trees:
 ```bash:
@@ -103,4 +103,14 @@ ggplot(weights) + geom_violin(aes(x = "T13", y = topo13)) + geom_boxplot(aes(x =
   scale_x_discrete(limits=c("T13", "T101", "T48"))
 ```
 ![violin](/Genome-Wide-Phylogenies.github.io/assets/Violin_plots_TW.png)
+
 As expected with high levels of allele sharing and large number of species trees, the weight distribution is skewed towards small values. There are few intermediates (~0.5), but also some gene trees that fully support these topologies (weight = 1).
+
+One final strategy to visualize all gene trees jointly is to use a ternary plot. This vizualization works only when there are three species tree topologies, and was introduced by [Stankowski et al. (2024)](https://www.science.org/doi/full/10.1126/science.adi2982). It essentially encompass the same information as violin plots but in a more compelling and esay to get way. I also allows to test for assymetries which indicate introgression (see Stankowski et al. for descriptions of this test). The supplements of this paper also includes lots of simulations showing expected ternary distributions under a wide range of demographic scenarios.
+
+```R:
+library(ggtern)
+
+ggtern(data=weights, aes(x=topo13, y=topo101, z=topo48)) + geom_hex_tern(bins=150) + scale_fill_gradientn(colours = heat.colors(5))
+```
+
