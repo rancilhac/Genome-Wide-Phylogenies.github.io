@@ -73,7 +73,6 @@ As you can see, the results are fairly difficult to interpret. This is because t
 For the sake of the example, and simpler visual representations, we will now consider the three commonest topologies:
 
 ```R:
-library(ape)
 library(ggplot2)
 
 # Names of the three commonest topologies
@@ -91,3 +90,16 @@ plot(topologies[[order(mean.weight, decreasing=T)[3]]], main=topo.names[3])
 barplot(mean.weight[order(mean.weight, decreasing=T)[1:3]], ylab="Mean weight")
 ```
 ![topos](/Genome-Wide-Phylogenies.github.io/assets/Plot_3_commonest_topos.png)
+
+A more informative alternative to barplots is to use violin plots, which will not only give us information about the mean weights of a given species tree topology but also the weights distribution across gene trees.
+
+```R:
+library(ggplot2)
+
+ggplot(weights) + geom_violin(aes(x = "T13", y = topo13)) + geom_boxplot(aes(x = "T13", y = topo13), width=0.05) +
+  geom_violin(aes(x = "T101", y = topo101)) + geom_boxplot(aes(x = "T101", y = topo101), width=0.05) +
+  geom_violin(aes(x = "T48", y = topo48)) + geom_boxplot(aes(x = "T48", y = topo48), width=0.05) +
+  theme_classic() + ylab("Weight") + xlab("Topology") +
+  scale_x_discrete(limits=c("T13", "T101", "T48"))
+```
+
