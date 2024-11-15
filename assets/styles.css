@@ -54,7 +54,7 @@ pre {
     border-radius: 5px;
     overflow-x: auto;
     margin: 1em 0;
-    font-size: 0.9em;
+    font-size: 1em;
     white-space: pre-wrap;
 }
 
@@ -70,7 +70,7 @@ code {
     background-color: #f4f4f4; /* Light background */
     padding: 2px 4px;          /* Small padding around inline code */
     border-radius: 3px;        /* Rounded corners */
-    font-size: 0.9em;          /* Slightly smaller font */
+    font-size: 1em;          /* Slightly smaller font */
     white-space: nowrap;       /* Prevents wrapping in the middle of inline code */
 }
 
