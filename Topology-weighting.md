@@ -102,4 +102,5 @@ ggplot(weights) + geom_violin(aes(x = "T13", y = topo13)) + geom_boxplot(aes(x =
   theme_classic() + ylab("Weight") + xlab("Topology") +
   scale_x_discrete(limits=c("T13", "T101", "T48"))
 ```
-
+![violin](/Genome-Wide-Phylogenies.github.io/assets/Violin_plots_TW.png)
+As expected with high levels of allele sharing and large number of species trees, the weight distribution is skewed towards small values. There are few intermediates (~0.5), but also some gene trees that fully support these topologies (weight = 1).
