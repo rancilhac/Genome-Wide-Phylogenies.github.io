@@ -90,3 +90,4 @@ plot(topologies[[order(mean.weight, decreasing=T)[3]]], main=topo.names[3])
 # We can also redo the barplot with only the three most common topologies
 barplot(mean.weight[order(mean.weight, decreasing=T)[1:3]], ylab="Mean weight")
 ```
+![topos](/Genome-Wide-Phylogenies.github.io/assets/Plot_3_commonest_topos.png)
