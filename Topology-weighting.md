@@ -111,6 +111,12 @@ One final strategy to visualize all gene trees jointly is to use a ternary plot.
 ```R:
 library(ggtern)
 
-ggtern(data=weights, aes(x=topo13, y=topo101, z=topo48)) + geom_hex_tern(bins=150) + scale_fill_gradientn(colours = heat.colors(5))
+# Adapt the bins argument to use smaller cells
+ggtern(data=weights, aes(x=topo13, y=topo101, z=topo48)) + geom_hex_tern(bins=25) + scale_fill_gradientn(colours = heat.colors(5))
 ```
+![tern](/Genome-Wide-Phylogenies.github.io/assets/Ternary_distrib.png)
+
+In this representation, each corner is a species tree topology, and gene trees are plotted in this three dimensional space, their position along the three axes representing the weight of the three species tree topology. A gene tree falling exactly in the middle (x=33.3, y=33.3, z=33.3) supports each species trees equaly, while one falling in a corner (e.g. x=1, y=0, z=0) lends full support to the species tree corresponding to this corner. Here we can see that most topologies fall in one of the corners, but there are also many intermediates between topo13 and topo101. Note that this representation is not biologically meaningfull because we selected only 3 out of 105 species trees, but this visualization is very useuful in cases with 3 ingroup species.
+
+## Vizualizing the results: variation of phylogenetic signal along a chromosome
 
