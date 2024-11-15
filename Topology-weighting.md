@@ -120,3 +120,27 @@ In this representation, each corner is a species tree topology, and gene trees a
 
 ## Vizualizing the results: variation of phylogenetic signal along a chromosome
 
+In addition to summarizing the support for each species tree, one can also vizualize how this support varies along a chromosome. This is very useful to investigate the processes underlying variation in phylogenetic signal, identify candidate regions associated with phenotypic traits, and investigate their evolutionary histories. Let's have a look at how the support for our three commonest topologies varies along chromosome 20:
+
+```R:
+library(tidyr)
+
+#first, we need to get coordinates for each of the windows used in the topology weighting analysis
+metadata <- read.table("TW_tutorial_windows_stats.tsv", header=T)
+#remember that we discarded windows where some tips were missing
+metadata <- metadata[metadata$NTIPS == 58, ]
+
+#Now we can prepare the data for plotting
+
+plot.tab <- data.frame(Chr.start = metadata$CHR.START,
+                       T13 = weights$topo13,
+                       T101 = weights$topo101,
+                       T48 = weights$topo48)
+
+plot.tab.long <- plot.tab %>% pivot_longer(cols=c(T13,T101,T48), names_to = "Topo", values_to="W")
+
+ggplot(plot.tab.long, aes(x=Chr.start, y=W, fill=Topo)) + geom_area(position = "stack") +
+  scale_fill_manual(values=c("#0075DC", "#2BCE48", "#F0A3FF")) + xlab("Position (bp)") + ylab("Weight") + 
+  theme_classic()
+```
+
