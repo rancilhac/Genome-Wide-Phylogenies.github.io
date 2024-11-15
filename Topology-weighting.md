@@ -143,4 +143,26 @@ ggplot(plot.tab.long, aes(x=Chr.start, y=W, fill=Topo)) + geom_area(position = "
   scale_fill_manual(values=c("#0075DC", "#2BCE48", "#F0A3FF")) + xlab("Position (bp)") + ylab("Weight") + 
   theme_classic()
 ```
+![chr](/Genome-Wide-Phylogenies.github.io/assets/barplot_along_chr.png)
 
+We see that windows lending high support for a given species tree are interespersed across the chromosome rather than clustering in the same region. This is expected when phylogenetic signal is very variable and recombination rate high, which decouples phylogenetic signal between physically neighboring regions of the chromosome.
+
+If the phylogenetic signal varies at a very small scale, it might be useful to smooth the weights before plotting them. This can be done with local polynomial regression (LOESS). Note however that LOESS smoothing assumes that all windows along the chromosome are sampled, meaning that there should not be too many windows discarded due to missing tips. This is not the case with the example data, so LOESS smoothing would not be appropriate. Anyway, here is a code example to perform smoothing before plotting:
+
+```R:
+plot.tab <- data.frame(Chr.start = metadata$CHR.START,
+                       T13 = predict(loess(weights$topo13~metadata$CHR.START, span=0.01), newdata = metadata$CHR.START),
+                       T101 = predict(loess(weights$topo101~metadata$CHR.START, span=0.01), newdata = metadata$CHR.START),
+                       T48 = predict(loess(weights$topo48~metadata$CHR.START, span=0.01), newdata = metadata$CHR.START))
+
+#Smoothing will occasionnaly give negative values, which are not possible and should be changed to zero (idem for values > 1)
+plot.tab$T13[plot.tab$T13 < 0] <- 0
+plot.tab$T101[plot.tab$T101 < 0] <- 0
+plot.tab$T48[plot.tab$T48 < 0] <- 0
+
+plot.tab.long <- plot.tab %>% pivot_longer(cols=c(T13,T101,T48), names_to = "Topo", values_to="W")
+
+ggplot(plot.tab.long, aes(x=Chr.start, y=W, fill=Topo)) + geom_area(position = "stack") +
+  scale_fill_manual(values=c("#0075DC", "#2BCE48", "#F0A3FF")) + xlab("Position (bp)") + ylab("Weight") + 
+  theme_classic()
+```
