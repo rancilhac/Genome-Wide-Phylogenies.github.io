@@ -45,6 +45,7 @@ html, body {
 /* Optional: To keep a uniform font across the page */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+     font-size: 18px;
 }	
 
 /* Style block-level code (within <pre> tags) */
