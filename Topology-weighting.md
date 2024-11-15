@@ -42,7 +42,17 @@ Now let's run TWISST:
 ```bash:
 python twisst.py -t TW_tutorial_TWISST.trees -w TWISST.weights --outputTopos TWISST.topologies --outgroup Mot_cin_outgroup --method complete -g Mot_agu -g Mot_alb -g Mot_gra -g Mot_sam -g Mot_mad -g Mot_cin_outgroup --groupsFile samples_map.txt
 ```
-TWISST outputs two files: `TWISST.topologies` contains a list of all possible species tree topologies, in parenthetical format; `TWISST.weights` is a table containing the weights (as well as the list of topologies at the beggining of the file). In the weights table each column is a topology and each line a gene tree. The value in a cell is the number of subtree of a given gene tree that match a given species tree. As usual, we will import this data into R to explore the results and do some vizualization.
+## Results vizualisation
+
+TWISST outputs two files: `TWISST.topologies` contains a list of all possible species tree topologies, in parenthetical format; `TWISST.weights` is a table containing the weights (as well as the list of topologies at the beggining of the file). In the weights table each column is a topology and each line a gene tree. The value in a cell is the number of subtree of a given gene tree that match a given species tree. Here is a simple example with three gene trees and three species trees:
+```bash:
+T1  T2  T3
+100 0   0
+0   50  50
+100 0   0
+```
+This tells us that the first and third gene tree match species tree T1, while the second supports both T2 and T3, indicating allele sharing across species.
+Let's now have a look at the real results. As usual, we will import this data into R to explore the data and do some vizualization:
 
 ```R:
 weights <- read.table("TWISST.weights", header=T)
@@ -58,3 +68,25 @@ mean.weight <- apply(weights, 2, mean)
 barplot(mean.weight[order(mean.weight)], ylab="Mean weight")
 ```
 ![barplot](/Genome-Wide-Phylogenies.github.io/assets/Mean_weight_barplot.png)
+
+As you can see, the results are fairly difficult to interpret. This is because the number of possible species tree topologies increases very fast with the number of species. Here, with 5 ingroup species there are already 105 possible rooted topologies. To keep things manageable, it is best to consider trees with less species. Three ingroup species is the best possible scenario (=3 species tree topologies), but four species is also manageable (=15 species tree topologies). Another observation is that the support is low even for the most supported topology. This is because most topologies are largely redundant. However, if there are high levels of allele sharing (as is the case with these species), one can expect every topology to receive a bit of support. With a large number of species tree topologies like here, this means that even the support for the commonest topology will remain low.
+For the sake of the example, and simpler visual representations, we will now consider the three commonest topologies:
+
+```R:
+library(ape)
+library(ggplot2)
+
+# Names of the three commonest topologies
+topo.names <- names(mean.weight[order(mean.weight, decreasing=T)][1:3])
+
+# Let's have a look at the three most supported topologies
+topologies <- read.tree("TWISST.topologies")
+
+par(mfrow=c(2,2))
+plot(topologies[[order(mean.weight, decreasing=T)[1]]], main=topo.names[1])
+plot(topologies[[order(mean.weight, decreasing=T)[2]]], main=topo.names[2])   
+plot(topologies[[order(mean.weight, decreasing=T)[3]]], main=topo.names[3])
+
+# We can also redo the barplot with only the three most common topologies
+barplot(mean.weight[order(mean.weight, decreasing=T)[1:3]], ylab="Mean weight")
+```
