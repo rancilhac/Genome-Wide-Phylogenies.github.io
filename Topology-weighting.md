@@ -57,3 +57,4 @@ weights <- prop.weight(weights)
 mean.weight <- apply(weights, 2, mean)
 barplot(mean.weight[order(mean.weight)], ylab="Mean weight")
 ```
+![barplot](/Genome-Wide-Phylogenies.github.io/assets/Mean_weight_barplot.png)
